@@ -11,6 +11,6 @@ This Repo requires:
 
 ## deplot in AWS
 
-- `cdk bootstrap`.
+- `cdk bootstrap`: To prepare inital stack.
 - `cdk synth`: To synth with AWS stacks.
-- `cdk deploy --all`: To deploy all AWS stacks, output diplays end-points.
+- `cdk deploy --all`: To deploy all AWS stacks, output displays end-points.
