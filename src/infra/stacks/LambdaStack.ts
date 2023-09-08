@@ -1,6 +1,7 @@
 import { Stack, StackProps } from "aws-cdk-lib";
 import { LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import { ITable } from "aws-cdk-lib/aws-dynamodb";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Code, Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
@@ -25,6 +26,15 @@ export class LambdaStack extends Stack {
                 TABLE_NAME: props.cypherTable.tableName
             }
         })
+
+        cypherLambda.addToRolePolicy(new PolicyStatement({
+            effect: Effect.ALLOW,
+            resources: [props.cypherTable.tableArn],
+            actions:[
+                'dynamodb:PutItem',
+                'dynamodb:Scan'
+            ]
+        }))
         
         this.cypherLamdaIntegration = new LambdaIntegration(cypherLambda)
 
