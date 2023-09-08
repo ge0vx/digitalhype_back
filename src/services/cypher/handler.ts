@@ -2,7 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { postCypher } from "./PostCypher";
 import { getCypher } from "./GetCypher";
-import { MissingFieldError } from "../shared/Validator";
+import { CypherFieldError, MissingFieldError } from "../shared/Validator";
 
 
 const ddbClient = new DynamoDBClient({});
@@ -23,9 +23,14 @@ async function handler(event:APIGatewayProxyEvent, context: Context): Promise<AP
                 break;
         }
     } catch(error) {
-        console.error(error);
-
         if(error instanceof MissingFieldError){
+            return {
+                statusCode: 400,
+                body: JSON.stringify(error.message)
+            }
+        }
+
+        if(error instanceof CypherFieldError){
             return {
                 statusCode: 400,
                 body: JSON.stringify(error.message)
