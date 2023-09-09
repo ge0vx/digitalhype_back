@@ -3,22 +3,25 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda
 import { postCypher } from "./PostCypher";
 import { getCypher } from "./GetCypher";
 import { CypherFieldError, MissingFieldError } from "../shared/Validator";
+import { addCorsHeader } from "../shared/Util";
 
 
 const ddbClient = new DynamoDBClient({});
 
 async function handler(event:APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
 
-    let message: string;
+    let response: APIGatewayProxyResult;
 
     try {
         switch (event.httpMethod) {
             case 'GET':
-                const getResponse = getCypher(event, ddbClient);
-                return getResponse;
+                const getResponse = await getCypher(event, ddbClient);
+                response = getResponse;
+                break;
             case 'POST':
-                const postResponse = postCypher(event, ddbClient);
-                return postResponse;
+                const postResponse = await postCypher(event, ddbClient);
+                response = postResponse;
+                break;
             default:
                 break;
         }
@@ -43,11 +46,7 @@ async function handler(event:APIGatewayProxyEvent, context: Context): Promise<AP
         }
     }
 
-    const response:APIGatewayProxyResult = {
-        statusCode: 200,
-        body: JSON.stringify(message),
-    }
-
+    addCorsHeader(response)
     return response;
 }
 
